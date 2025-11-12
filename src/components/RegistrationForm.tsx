@@ -56,7 +56,7 @@ export default function RegistrationForm() {
 
     } catch (error: any) {
       setIsSuccess(false);
-      setMessage(`❌ Erro: ${error.message || 'Não foi possível ligar ao servidor.'}`);
+      setMessage(`❌ Erro: ${error.message || 'Não foi possível conectar ao servidor.'}`);
     } finally {
       setLoading(false);
     }
