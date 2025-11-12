@@ -78,7 +78,7 @@ export default function RegistrationForm() {
         <form onSubmit={handleSubmit} className="space-y-4">
           
           <div>
-            <label className="block text-sm font-medium text-gray-700">Nome da Organização (Igreja)</label>
+            <label className="block text-sm font-medium text-gray-900">Nome da Organização (Igreja)</label>
             <input
               type="text"
               name="organizationName"
@@ -91,7 +91,7 @@ export default function RegistrationForm() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">Seu Nome (Administrador)</label>
+            <label className="block text-sm font-medium text-gray-900">Seu Nome (Administrador)</label>
             <input
               type="text"
               name="userName"
@@ -104,7 +104,7 @@ export default function RegistrationForm() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">Email (Será o Login)</label>
+            <label className="block text-sm font-medium text-gray-900">Email (Será o Login)</label>
             <input
               type="email"
               name="userEmail"
@@ -117,7 +117,7 @@ export default function RegistrationForm() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">Senha (Mín. 6 caracteres)</label>
+            <label className="block text-sm font-medium text-gray-900">Senha (Mín. 6 caracteres)</label>
             <input
               type="password"
               name="userPassword"
