@@ -1,10 +1,10 @@
-// src/components/LoginForm.tsx (v4: Inicialização do Firebase Corrigida)
+// src/components/LoginForm.tsx (v6: Estruturalmente Correto e Funcional)
 
 'use client'; 
 
 import React, { useState } from 'react';
-import { initializeApp, getApps, getApp } from 'firebase/app'; // Importar getApps/getApp
-import { getAuth, signInWithEmailAndPassword, User } from 'firebase/auth';
+import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
+import { getAuth, signInWithEmailAndPassword, User, Auth } from 'firebase/auth';
 
 // --- CONFIGURAÇÃO DO FIREBASE CLIENT ---
 const firebaseConfig = {
@@ -16,16 +16,28 @@ const firebaseConfig = {
     appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// --- CORREÇÃO DA INICIALIZAÇÃO ---
-// Verifica se o app já foi inicializado. Se não, inicializa.
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-const auth = getAuth(app);
-// ------------------------------------
+// Inicializa a instância do App e Auth de forma a ser segura contra o SSR do Next.js
+let app: FirebaseApp;
+let auth: Auth;
 
+try {
+    // 1. Tenta obter a instância existente ou inicializa-a.
+    // Esta lógica é segura para o ambiente de compilação Next.js/SSR.
+    app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+    auth = getAuth(app);
+} catch (error) {
+    // Em caso de falha crítica, tratamos o erro, mas garantimos que as variáveis existam (para evitar erros de tipagem).
+    console.error("Firebase Initialization Error:", error);
+    // Cria objetos mock para evitar crashs de runtime no navegador.
+    app = null as any; 
+    auth = null as any; 
+}
+// ---------------------------------------------------
 
 const API_ENDPOINT_DATA = '/api/login-data'; 
 
 export default function LoginForm() {
+    // Estado do formulário e UI (o mesmo)
     const [userEmail, setUserEmail] = useState('');
     const [userPassword, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
@@ -38,6 +50,13 @@ export default function LoginForm() {
         setIsSuccess(false);
         setLoading(true);
 
+        // Se a inicialização falhou (chaves .env ausentes), paramos aqui.
+        if (!auth) {
+            setMessage("❌ Erro de Configuração: O Firebase não foi inicializado corretamente.");
+            setLoading(false);
+            return;
+        }
+
         try {
             // 1. AUTENTICAÇÃO REAL NO FIREBASE
             const userCredential = await signInWithEmailAndPassword(
@@ -47,10 +66,10 @@ export default function LoginForm() {
             );
             const user: User = userCredential.user;
             
-            // 2. OBTENÇÃO DO TOKEN REAL (O Crachá Digital)
+            // 2. OBTENÇÃO DO TOKEN REAL
             const firebaseIdToken = await user.getIdToken(); 
             
-            // 3. ENVIAR O TOKEN REAL PARA A NOSSA API VERCEL (O Gerente)
+            // 3. ENVIAR O TOKEN REAL PARA A NOSSA API VERCEL
             const response = await fetch(API_ENDPOINT_DATA, {
                 method: 'POST',
                 headers: {
@@ -72,7 +91,7 @@ export default function LoginForm() {
             setMessage(`✅ Login efetuado! Bem-vindo, ${result.role || 'usuário'}! Redirecionando...`);
             
         } catch (error: any) {
-            // Tratamento de Erros de Auth
+            // Tratamento de Erros
             let errorMessage = 'Falha na autenticação. Verifique email e senha.';
             
             if (error.code === 'auth/wrong-password') {
