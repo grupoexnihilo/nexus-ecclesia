@@ -86,7 +86,7 @@ export default function RegistrationForm() {
               onChange={handleChange}
               required
               disabled={loading}
-              className="mt-1 w-full p-2 border border-gray-300 rounded-md"
+              className="mt-1 w-full p-2 border border-gray-900 rounded-md"
             />
           </div>
 
@@ -99,7 +99,7 @@ export default function RegistrationForm() {
               onChange={handleChange}
               required
               disabled={loading}
-              className="mt-1 w-full p-2 border border-gray-300 rounded-md"
+              className="mt-1 w-full p-2 border border-gray-900 rounded-md"
             />
           </div>
 
@@ -112,7 +112,7 @@ export default function RegistrationForm() {
               onChange={handleChange}
               required
               disabled={loading}
-              className="mt-1 w-full p-2 border border-gray-9git add git add .00 rounded-md"
+              className="mt-1 w-full p-2 border border-gray-900 rounded-md"
             />
           </div>
 
