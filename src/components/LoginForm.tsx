@@ -1,14 +1,13 @@
-// src/components/LoginForm.tsx (v3: Implementação Final da Autenticação)
+// src/components/LoginForm.tsx (v4: Inicialização do Firebase Corrigida)
 
 'use client'; 
 
 import React, { useState } from 'react';
-import { initializeApp } from 'firebase/app';
+import { initializeApp, getApps, getApp } from 'firebase/app'; // Importar getApps/getApp
 import { getAuth, signInWithEmailAndPassword, User } from 'firebase/auth';
 
-// --- CONFIGURAÇÃO DO FIREBASE CLIENT (Lendo as chaves do .env.local) ---
+// --- CONFIGURAÇÃO DO FIREBASE CLIENT ---
 const firebaseConfig = {
-    // Usamos process.env pois estas chaves são expostas ao frontend.
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
     authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
     projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
@@ -17,13 +16,11 @@ const firebaseConfig = {
     appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// Inicializa a instância do App e Auth
-let app;
-if (typeof window !== 'undefined' && !initializeApp) {
-    app = initializeApp(firebaseConfig);
-}
+// --- CORREÇÃO DA INICIALIZAÇÃO ---
+// Verifica se o app já foi inicializado. Se não, inicializa.
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const auth = getAuth(app);
-// ---------------------------------------------------
+// ------------------------------------
 
 
 const API_ENDPOINT_DATA = '/api/login-data'; 
@@ -42,7 +39,7 @@ export default function LoginForm() {
         setLoading(true);
 
         try {
-            // 1. AUTENTICAÇÃO REAL NO FIREBASE (CLIENT-SIDE)
+            // 1. AUTENTICAÇÃO REAL NO FIREBASE
             const userCredential = await signInWithEmailAndPassword(
                 auth,
                 userEmail,
@@ -58,7 +55,7 @@ export default function LoginForm() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${firebaseIdToken}`, // Token REAL enviado!
+                    'Authorization': `Bearer ${firebaseIdToken}`, 
                 },
                 body: JSON.stringify({ userEmail }),
             });
@@ -75,7 +72,7 @@ export default function LoginForm() {
             setMessage(`✅ Login efetuado! Bem-vindo, ${result.role || 'usuário'}! Redirecionando...`);
             
         } catch (error: any) {
-            // Tratamento de Erros do Firebase Auth
+            // Tratamento de Erros de Auth
             let errorMessage = 'Falha na autenticação. Verifique email e senha.';
             
             if (error.code === 'auth/wrong-password') {
@@ -83,7 +80,6 @@ export default function LoginForm() {
             } else if (error.code === 'auth/user-not-found') {
                  errorMessage = 'Usuário não encontrado.';
             } else if (error.message) {
-                 // Propaga a mensagem de erro da nossa API se for o caso
                  errorMessage = error.message; 
             }
 
