@@ -16,6 +16,8 @@ const firebaseConfig = {
     appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
+console.log("CHAVE FIREBASE LIDA:", process.env.NEXT_PUBLIC_FIREBASE_API_KEY);
+
 // Inicializa a instância do App e Auth de forma a ser segura contra o SSR do Next.js
 let app: FirebaseApp;
 let auth: Auth;
